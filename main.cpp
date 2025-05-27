@@ -3,9 +3,7 @@
 bool App::OnInit() {
     MainFrame* frame = new MainFrame(ID_MAIN_FRAME);
 
-    wxColor bgColor(0x33, 0x28, 0x30);
-
-    frame->SetBackgroundColour(bgColor);
+    frame->SetBackgroundColour(mainBgColor);
 
     frame->Show();
     return true;
@@ -14,41 +12,49 @@ bool App::OnInit() {
 void MainFrame::CreateControls() {
     wxFont titleFont = wxFont(wxFontInfo(32).Bold());
     titleText = new wxStaticText(mainPanel, wxID_ANY,
-                        "Random Reminder");
+                        "Random Reminder", wxDefaultPosition, wxDefaultSize,
+                    wxBORDER_NONE);
     titleText->SetFont(titleFont);
+    titleText->SetForegroundColour(titleTextColor);
 
     minWaitSlider = new wxSlider(mainPanel, ID_MIN_SLIDER,
                                 5, 1, 120, wxDefaultPosition,
-                            wxSize(100, -1));
+                            wxSize(100, -1), wxSL_VALUE_LABEL);
+    minWaitSlider->SetForegroundColour(mainTextColor);
+    minWaitSliderLabel = new wxStaticText(mainPanel, wxID_ANY, "Minimum Wait");
+    minWaitSliderLabel->SetForegroundColour(mainTextColor);
 
     maxWaitSlider = new wxSlider(mainPanel, ID_MAX_SLIDER,
                                 45, 2, 240, wxDefaultPosition,
-                            wxSize(100, -1));
+                            wxSize(100, -1), wxSL_VALUE_LABEL);
+    maxWaitSlider->SetForegroundColour(mainTextColor);
+    maxWaitSliderLabel = new wxStaticText(mainPanel, wxID_ANY, "Maximum Wait");
+    maxWaitSliderLabel->SetForegroundColour(mainTextColor);
 
     notifTextArea = new wxTextCtrl(mainPanel, ID_NOTIF_INPUT,
                                 "Random Reminder", wxDefaultPosition,
                                 wxSize(150, 100));
+    notifTextArea->SetBackgroundColour(controlBgColor);
+    notifTextArea->SetForegroundColour(mainTextColor);
     
     autoRestartCheck = new wxCheckBox(mainPanel, ID_RESTART_CHK,
-                            "Auto Restart", wxDefaultPosition, wxSize(-1, 50));
+                            "Auto Restart", wxDefaultPosition, wxSize(-1, -1));
+    autoRestartCheck->SetForegroundColour(mainTextColor);
 
     playPauseButton = new wxButton(mainPanel, ID_PLAY_PAUSE,
                         "Toggle On/Off", wxDefaultPosition,
                         wxSize(-1, 50));
+    playPauseButton->SetBackgroundColour(controlBgColor);
+    playPauseButton->SetForegroundColour(mainTextColor);
     
     restartButton = new wxButton(mainPanel, ID_RESTART,
                         "Restart", wxDefaultPosition,
                         wxSize(-1 , 50));
+    restartButton->SetBackgroundColour(controlBgColor);
+    restartButton->SetForegroundColour(mainTextColor);
 }
 
 void MainFrame::SetupSizers() {
-    // minWaitSlider->Hide();
-    // maxWaitSlider->Hide();
-    // notifTextArea->Hide();
-    // autoRestartCheck->Hide();
-    // playPauseButton->Hide();
-    // restartButton->Hide();
-
     wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 
     mainSizer->Add(
@@ -65,21 +71,29 @@ void MainFrame::SetupSizers() {
     wxBoxSizer* sliderSizer = new wxBoxSizer(wxVERTICAL);
     wxSizerFlags sliderFlags = wxSizerFlags(1).CenterHorizontal();
 
-    sliderSizer->AddStretchSpacer(1);
+    sliderSizer->AddStretchSpacer(2);
 
     sliderSizer->Add(
         minWaitSlider,
         sliderFlags
     );
+    sliderSizer->Add(
+        minWaitSliderLabel,
+        sliderFlags
+    );
 
-    sliderSizer->AddStretchSpacer(1);
+    sliderSizer->AddStretchSpacer(2);
 
     sliderSizer->Add(
         maxWaitSlider,
         sliderFlags
     );
+    sliderSizer->Add(
+        maxWaitSliderLabel,
+        sliderFlags
+    );
 
-    sliderSizer->AddStretchSpacer(1);
+    sliderSizer->AddStretchSpacer(2);
 
     middleSizer->AddStretchSpacer(1);
 
@@ -103,9 +117,8 @@ void MainFrame::SetupSizers() {
 
     middleSizer->Add(
         notifTextCtrlSizer,
-        wxSizerFlags(2).CenterVertical()
+        wxSizerFlags(2).Expand()
     );
-
 
     middleSizer->AddStretchSpacer(1);
 
@@ -130,17 +143,23 @@ void MainFrame::SetupSizers() {
         wxSizerFlags(1).CenterHorizontal()
     );
 
-    mainPanel->SetSizer(mainSizer);
-    mainSizer->SetSizeHints(this);
+    wxGridSizer* outerSizer = new wxGridSizer(1, 1, 0);
+
+    outerSizer->Add(
+        mainSizer,
+        wxSizerFlags().Expand().Border(wxALL, 25)
+    );
+
+    mainPanel->SetSizer(outerSizer);
+    outerSizer->SetSizeHints(this);
 }
 
-MainFrame::MainFrame(int id) : wxFrame(NULL, id, "Hello World") {
+MainFrame::MainFrame(int id) : wxFrame(NULL, id, "Random Reminder") {
     mainPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(500, -1));
 
     CreateControls();
 
     SetupSizers();
-    // mainSizer->SetSizeHints(this);
 }
 
 wxIMPLEMENT_APP(App);

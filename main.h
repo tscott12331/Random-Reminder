@@ -21,12 +21,24 @@ class MainFrame : public wxFrame {
         wxPanel* mainPanel;
 
         wxStaticText* titleText;
+
         wxSlider* minWaitSlider;
+        wxStaticText* minWaitSliderLabel;
+
         wxSlider* maxWaitSlider;
+        wxStaticText* maxWaitSliderLabel;
+        
         wxTextCtrl* notifTextArea;
+
         wxCheckBox* autoRestartCheck;
+
         wxButton* playPauseButton;
+
         wxButton* restartButton;
+
+        const wxColor titleTextColor = wxColor(0x40, 0x40, 0x40);
+        const wxColor mainTextColor = wxColor(0x50, 0x50, 0x50);
+        const wxColor controlBgColor = wxColor(0xee, 0xee, 0xee);
 
         void CreateControls();
         void SetupSizers();
@@ -35,6 +47,9 @@ class MainFrame : public wxFrame {
 class App : public wxApp {
     public:
         virtual bool OnInit();
+    
+    private:
+        const wxColor mainBgColor = wxColor(0xD6, 0xB5, 0x88);
 };
 
 #endif
