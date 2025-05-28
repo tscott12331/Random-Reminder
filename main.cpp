@@ -20,15 +20,23 @@ void MainFrame::OnPlayPause(wxCommandEvent& event) {
     } else {
         timeStarted = wxGetLocalTimeMillis().GetLo();
         playPauseButton->SetLabelText("Pause");
-        timer.Start((int)timeRemaining, wxTIMER_ONE_SHOT);
+        timer.Start(timeRemaining, wxTIMER_ONE_SHOT);
     }
 }
 
 void MainFrame::OnTimerEnd(wxTimerEvent& event) {
     // set new random currentInterval
     timeRemaining = currentInterval;
-    playPauseButton->SetLabelText("Play");
-    wxLogStatus(wxString::Format("Reminder at %ld", wxGetLocalTime()));
+
+    if(autoRestartCheck->IsChecked()) {
+        playPauseButton->SetLabelText("Pause");
+        timeStarted = wxGetLocalTimeMillis().GetLo();
+        timer.Start(timeRemaining, wxTIMER_ONE_SHOT);
+        wxLogStatus(wxString::Format("Restarting"));
+    } else {
+        playPauseButton->SetLabelText("Start");
+        wxLogStatus(wxString::Format("Reminder at %ld", wxGetLocalTime()));
+    }
 }
 
 void MainFrame::BindEventHandlers() {
@@ -69,7 +77,7 @@ void MainFrame::CreateControls() {
     autoRestartCheck->SetForegroundColour(mainTextColor);
 
     playPauseButton = new wxButton(mainPanel, ID_PLAY_PAUSE,
-                        "Play", wxDefaultPosition,
+                        "Start", wxDefaultPosition,
                         wxSize(-1, 50));
     playPauseButton->SetBackgroundColour(controlBgColor);
     playPauseButton->SetForegroundColour(mainTextColor);
