@@ -1,23 +1,38 @@
 #include "main.h"
 
 bool App::OnInit() {
+    srand(time(NULL));
     MainFrame* frame = new MainFrame(ID_MAIN_FRAME);
-
+    
     frame->SetBackgroundColour(mainBgColor);
 
     frame->Show();
     return true;
 }
 
+void MainFrame::onMaxSliderChange(wxCommandEvent& event) {
+    minWaitSlider->SetMax(event.GetInt());
+}
+
+void MainFrame::onMinSliderChange(wxCommandEvent& event) {
+    maxWaitSlider->SetMin(event.GetInt());
+}
+
 void MainFrame::OnPlayPause(wxCommandEvent& event) {
     if(timer.IsRunning()) {
         long currentTime = wxGetLocalTimeMillis().GetLo();
         timeRemaining = timeRemaining - (currentTime - timeStarted);
-        // wxLogStatus(wxString::Format("timeStarted: %lu\ncurrentTime: %lu", timeStarted, currentTime));
         wxLogStatus(wxString::Format("Time: %ld", timeRemaining));
         playPauseButton->SetLabelText("Start");
         timer.Stop();
     } else {
+        if(timeRemaining == currentInterval) {
+            currentInterval = (rand() % (maxWaitSlider->GetValue() -
+                                        minWaitSlider->GetValue() + 1) +
+                                        minWaitSlider->GetValue())
+                                        * 60 * 1000;
+            timeRemaining = currentInterval;
+        }
         timeStarted = wxGetLocalTimeMillis().GetLo();
         playPauseButton->SetLabelText("Pause");
         timer.Start(timeRemaining, wxTIMER_ONE_SHOT);
@@ -26,6 +41,10 @@ void MainFrame::OnPlayPause(wxCommandEvent& event) {
 
 void MainFrame::OnTimerEnd(wxTimerEvent& event) {
     // set new random currentInterval
+    currentInterval = (rand() % (maxWaitSlider->GetValue() -
+                                minWaitSlider->GetValue() + 1) +
+                                minWaitSlider->GetValue())
+                                * 60 * 1000;
     timeRemaining = currentInterval;
 
     if(autoRestartCheck->IsChecked()) {
@@ -42,6 +61,8 @@ void MainFrame::OnTimerEnd(wxTimerEvent& event) {
 void MainFrame::BindEventHandlers() {
     playPauseButton->Bind(wxEVT_BUTTON, &MainFrame::OnPlayPause, this);
     timer.Bind(wxEVT_TIMER, &MainFrame::OnTimerEnd, this);
+    maxWaitSlider->Bind(wxEVT_SLIDER, &MainFrame::onMaxSliderChange, this);
+    minWaitSlider->Bind(wxEVT_SLIDER, &MainFrame::onMinSliderChange, this);
 }
 
 void MainFrame::CreateControls() {

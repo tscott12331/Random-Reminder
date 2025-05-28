@@ -44,6 +44,8 @@ class MainFrame : public wxFrame {
 
         void OnPlayPause(wxCommandEvent& event);
         void OnTimerEnd(wxTimerEvent& event);
+        void onMaxSliderChange(wxCommandEvent& event);
+        void onMinSliderChange(wxCommandEvent& event);
 };
 
 class App : public wxApp {
