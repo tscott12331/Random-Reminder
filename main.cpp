@@ -9,6 +9,33 @@ bool App::OnInit() {
     return true;
 }
 
+void MainFrame::OnPlayPause(wxCommandEvent& event) {
+    if(timer.IsRunning()) {
+        long currentTime = wxGetLocalTimeMillis().GetLo();
+        timeRemaining = timeRemaining - (currentTime - timeStarted);
+        // wxLogStatus(wxString::Format("timeStarted: %lu\ncurrentTime: %lu", timeStarted, currentTime));
+        wxLogStatus(wxString::Format("Time: %ld", timeRemaining));
+        playPauseButton->SetLabelText("Start");
+        timer.Stop();
+    } else {
+        timeStarted = wxGetLocalTimeMillis().GetLo();
+        playPauseButton->SetLabelText("Pause");
+        timer.Start((int)timeRemaining, wxTIMER_ONE_SHOT);
+    }
+}
+
+void MainFrame::OnTimerEnd(wxTimerEvent& event) {
+    // set new random currentInterval
+    timeRemaining = currentInterval;
+    playPauseButton->SetLabelText("Play");
+    wxLogStatus(wxString::Format("Reminder at %ld", wxGetLocalTime()));
+}
+
+void MainFrame::BindEventHandlers() {
+    playPauseButton->Bind(wxEVT_BUTTON, &MainFrame::OnPlayPause, this);
+    timer.Bind(wxEVT_TIMER, &MainFrame::OnTimerEnd, this);
+}
+
 void MainFrame::CreateControls() {
     wxFont titleFont = wxFont(wxFontInfo(32).Bold());
     titleText = new wxStaticText(mainPanel, wxID_ANY,
@@ -42,7 +69,7 @@ void MainFrame::CreateControls() {
     autoRestartCheck->SetForegroundColour(mainTextColor);
 
     playPauseButton = new wxButton(mainPanel, ID_PLAY_PAUSE,
-                        "Toggle On/Off", wxDefaultPosition,
+                        "Play", wxDefaultPosition,
                         wxSize(-1, 50));
     playPauseButton->SetBackgroundColour(controlBgColor);
     playPauseButton->SetForegroundColour(mainTextColor);
@@ -160,6 +187,10 @@ MainFrame::MainFrame(int id) : wxFrame(NULL, id, "Random Reminder") {
     CreateControls();
 
     SetupSizers();
+
+    CreateStatusBar();
+
+    BindEventHandlers();
 }
 
 wxIMPLEMENT_APP(App);

@@ -19,22 +19,20 @@ class MainFrame : public wxFrame {
 
     private:
         wxPanel* mainPanel;
-
         wxStaticText* titleText;
-
         wxSlider* minWaitSlider;
         wxStaticText* minWaitSliderLabel;
-
         wxSlider* maxWaitSlider;
         wxStaticText* maxWaitSliderLabel;
-        
         wxTextCtrl* notifTextArea;
-
         wxCheckBox* autoRestartCheck;
-
         wxButton* playPauseButton;
-
         wxButton* restartButton;
+
+        wxTimer timer;
+        long currentInterval = 5000;
+        long timeRemaining = 5000;
+        long timeStarted;
 
         const wxColor titleTextColor = wxColor(0x40, 0x40, 0x40);
         const wxColor mainTextColor = wxColor(0x50, 0x50, 0x50);
@@ -42,6 +40,10 @@ class MainFrame : public wxFrame {
 
         void CreateControls();
         void SetupSizers();
+        void BindEventHandlers();
+
+        void OnPlayPause(wxCommandEvent& event);
+        void OnTimerEnd(wxTimerEvent& event);
 };
 
 class App : public wxApp {
