@@ -10,11 +10,18 @@ bool App::OnInit() {
     return true;
 }
 
-void MainFrame::onMaxSliderChange(wxCommandEvent& event) {
+void MainFrame::OnResetPressed(wxCommandEvent& event) {
+    timer.Stop();
+    timeRemaining = currentInterval;
+    playPauseButton->SetLabelText("Start");
+    wxLogStatus("Timer reset");
+}
+
+void MainFrame::OnMaxSliderChange(wxCommandEvent& event) {
     minWaitSlider->SetMax(event.GetInt());
 }
 
-void MainFrame::onMinSliderChange(wxCommandEvent& event) {
+void MainFrame::OnMinSliderChange(wxCommandEvent& event) {
     maxWaitSlider->SetMin(event.GetInt());
 }
 
@@ -61,8 +68,9 @@ void MainFrame::OnTimerEnd(wxTimerEvent& event) {
 void MainFrame::BindEventHandlers() {
     playPauseButton->Bind(wxEVT_BUTTON, &MainFrame::OnPlayPause, this);
     timer.Bind(wxEVT_TIMER, &MainFrame::OnTimerEnd, this);
-    maxWaitSlider->Bind(wxEVT_SLIDER, &MainFrame::onMaxSliderChange, this);
-    minWaitSlider->Bind(wxEVT_SLIDER, &MainFrame::onMinSliderChange, this);
+    maxWaitSlider->Bind(wxEVT_SLIDER, &MainFrame::OnMaxSliderChange, this);
+    minWaitSlider->Bind(wxEVT_SLIDER, &MainFrame::OnMinSliderChange, this);
+    resetButton->Bind(wxEVT_BUTTON, &MainFrame::OnResetPressed, this);
 }
 
 void MainFrame::CreateControls() {
@@ -103,11 +111,11 @@ void MainFrame::CreateControls() {
     playPauseButton->SetBackgroundColour(controlBgColor);
     playPauseButton->SetForegroundColour(mainTextColor);
     
-    restartButton = new wxButton(mainPanel, ID_RESTART,
-                        "Restart", wxDefaultPosition,
+    resetButton = new wxButton(mainPanel, ID_RESET,
+                        "Reset", wxDefaultPosition,
                         wxSize(-1 , 50));
-    restartButton->SetBackgroundColour(controlBgColor);
-    restartButton->SetForegroundColour(mainTextColor);
+    resetButton->SetBackgroundColour(controlBgColor);
+    resetButton->SetForegroundColour(mainTextColor);
 }
 
 void MainFrame::SetupSizers() {
@@ -190,7 +198,7 @@ void MainFrame::SetupSizers() {
         wxSizerFlags().CenterVertical()
     );
     bottomSizer->Add(
-        restartButton,
+        resetButton,
         wxSizerFlags().CenterVertical()
     );
 

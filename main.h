@@ -10,7 +10,7 @@ enum
     ID_NOTIF_INPUT,
     ID_RESTART_CHK,
     ID_PLAY_PAUSE,
-    ID_RESTART
+    ID_RESET
 };
 
 class MainFrame : public wxFrame {
@@ -27,7 +27,7 @@ class MainFrame : public wxFrame {
         wxTextCtrl* notifTextArea;
         wxCheckBox* autoRestartCheck;
         wxButton* playPauseButton;
-        wxButton* restartButton;
+        wxButton* resetButton;
 
         wxTimer timer;
         long currentInterval = 5000;
@@ -44,8 +44,9 @@ class MainFrame : public wxFrame {
 
         void OnPlayPause(wxCommandEvent& event);
         void OnTimerEnd(wxTimerEvent& event);
-        void onMaxSliderChange(wxCommandEvent& event);
-        void onMinSliderChange(wxCommandEvent& event);
+        void OnMaxSliderChange(wxCommandEvent& event);
+        void OnMinSliderChange(wxCommandEvent& event);
+        void OnResetPressed(wxCommandEvent& event);
 };
 
 class App : public wxApp {
