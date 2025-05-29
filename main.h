@@ -1,6 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 #include <wx/wx.h>
+#include <wx/notifmsg.h>
 
 enum
 {
@@ -28,6 +29,8 @@ class MainFrame : public wxFrame {
         wxCheckBox* autoRestartCheck;
         wxButton* playPauseButton;
         wxButton* resetButton;
+
+        wxNotificationMessage* notification;
 
         wxTimer timer;
         long currentInterval = 5000;

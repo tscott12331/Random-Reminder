@@ -2,7 +2,7 @@
 
 bool App::OnInit() {
     srand(time(NULL));
-    MainFrame* frame = new MainFrame(ID_MAIN_FRAME);
+    MainFrame* frame = new MainFrame(wxID_ANY);
     
     frame->SetBackgroundColour(mainBgColor);
 
@@ -36,8 +36,8 @@ void MainFrame::OnPlayPause(wxCommandEvent& event) {
         if(timeRemaining == currentInterval) {
             currentInterval = (rand() % (maxWaitSlider->GetValue() -
                                         minWaitSlider->GetValue() + 1) +
-                                        minWaitSlider->GetValue())
-                                        * 60 * 1000;
+                                        minWaitSlider->GetValue()) * 1000;
+                                        // * 60 * 1000;
             timeRemaining = currentInterval;
         }
         timeStarted = wxGetLocalTimeMillis().GetLo();
@@ -47,21 +47,24 @@ void MainFrame::OnPlayPause(wxCommandEvent& event) {
 }
 
 void MainFrame::OnTimerEnd(wxTimerEvent& event) {
+    notification->SetMessage(notifTextArea->GetValue());
+    notification->Show(wxNotificationMessage::Timeout_Auto);
+
     // set new random currentInterval
     currentInterval = (rand() % (maxWaitSlider->GetValue() -
                                 minWaitSlider->GetValue() + 1) +
-                                minWaitSlider->GetValue())
-                                * 60 * 1000;
+                                minWaitSlider->GetValue()) * 1000;
+                                // * 60 * 1000;
     timeRemaining = currentInterval;
 
     if(autoRestartCheck->IsChecked()) {
         playPauseButton->SetLabelText("Pause");
         timeStarted = wxGetLocalTimeMillis().GetLo();
         timer.Start(timeRemaining, wxTIMER_ONE_SHOT);
-        wxLogStatus(wxString::Format("Restarting"));
+        // wxLogStatus(wxString::Format("Restarting"));
     } else {
         playPauseButton->SetLabelText("Start");
-        wxLogStatus(wxString::Format("Reminder at %ld", wxGetLocalTime()));
+        // wxLogStatus(wxString::Format("Reminder at %ld", wxGetLocalTime()));
     }
 }
 
@@ -89,7 +92,7 @@ void MainFrame::CreateControls() {
     minWaitSliderLabel->SetForegroundColour(mainTextColor);
 
     maxWaitSlider = new wxSlider(mainPanel, ID_MAX_SLIDER,
-                                45, 2, 240, wxDefaultPosition,
+                                45, 5, 240, wxDefaultPosition,
                             wxSize(100, -1), wxSL_VALUE_LABEL);
     maxWaitSlider->SetForegroundColour(mainTextColor);
     maxWaitSliderLabel = new wxStaticText(mainPanel, wxID_ANY, "Maximum Wait");
@@ -97,9 +100,10 @@ void MainFrame::CreateControls() {
 
     notifTextArea = new wxTextCtrl(mainPanel, ID_NOTIF_INPUT,
                                 "Random Reminder", wxDefaultPosition,
-                                wxSize(150, 100));
+                                wxSize(150, 100), wxTE_MULTILINE);
     notifTextArea->SetBackgroundColour(controlBgColor);
     notifTextArea->SetForegroundColour(mainTextColor);
+    notifTextArea->SetMaxLength(256);
     
     autoRestartCheck = new wxCheckBox(mainPanel, ID_RESTART_CHK,
                             "Auto Restart", wxDefaultPosition, wxSize(-1, -1));
@@ -218,8 +222,12 @@ void MainFrame::SetupSizers() {
     outerSizer->SetSizeHints(this);
 }
 
-MainFrame::MainFrame(int id) : wxFrame(NULL, id, "Random Reminder") {
+MainFrame::MainFrame(int id) : wxFrame(nullptr, id, "Random Reminder") {
     mainPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(500, -1));
+
+    wxIcon icon;
+    icon.LoadFile("icon.ico", wxBITMAP_TYPE_ICO);
+    SetIcon(icon);
 
     CreateControls();
 
@@ -228,6 +236,10 @@ MainFrame::MainFrame(int id) : wxFrame(NULL, id, "Random Reminder") {
     CreateStatusBar();
 
     BindEventHandlers();
+
+    notification = new wxNotificationMessage("Random Reminder",
+                            notifTextArea->GetValue(), this);
+    notification->SetFlags(0);
 }
 
 wxIMPLEMENT_APP(App);
