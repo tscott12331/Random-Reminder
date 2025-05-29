@@ -36,8 +36,8 @@ void MainFrame::OnPlayPause(wxCommandEvent& event) {
         if(timeRemaining == currentInterval) {
             currentInterval = (rand() % (maxWaitSlider->GetValue() -
                                         minWaitSlider->GetValue() + 1) +
-                                        minWaitSlider->GetValue()) * 1000;
-                                        // * 60 * 1000;
+                                        minWaitSlider->GetValue())
+                                        * 60 * 1000;
             timeRemaining = currentInterval;
         }
         timeStarted = wxGetLocalTimeMillis().GetLo();
@@ -53,8 +53,8 @@ void MainFrame::OnTimerEnd(wxTimerEvent& event) {
     // set new random currentInterval
     currentInterval = (rand() % (maxWaitSlider->GetValue() -
                                 minWaitSlider->GetValue() + 1) +
-                                minWaitSlider->GetValue()) * 1000;
-                                // * 60 * 1000;
+                                minWaitSlider->GetValue())
+                                * 60 * 1000;
     timeRemaining = currentInterval;
 
     if(autoRestartCheck->IsChecked()) {
